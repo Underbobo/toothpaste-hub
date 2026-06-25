@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>牙膏资讯汇 - 行业新规与动态</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --primary: #0891b2;
+      --primary-light: #22d3ee;
+      --primary-dark: #0e7490;
+      --bg: #0c4a6e;
+      --card-bg: rgba(255,255,255,0.06);
+      --text: #e0f2fe;
+      --text-secondary: #7dd3fc;
+      --border: rgba(255,255,255,0.08);
+      --success: #34d399;
+      --warning: #fbbf24;
+      --danger: #f87171;
+    }
+    body {
+      font-family: 'Noto Sans SC', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    .bg-pattern {
+      position: fixed; inset: 0;
+      background-image:
+        radial-gradient(circle at 20% 50%, rgba(34,211,238,0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(8,145,178,0.1) 0%, transparent 50%),
+        radial-gradient(circle at 50% 80%, rgba(14,116,144,0.06) 0%, transparent 50%);
+      pointer-events: none; z-index: 0;
+    }
+    .container { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+    header { padding: 60px 0 40px; text-align: center; }
+    .logo {
+      font-size: 3rem; font-weight: 700;
+      background: linear-gradient(135deg, #22d3ee, #0891b2, #0e7490);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; letter-spacing: -1px; margin-bottom: 12px;
+    }
+    .subtitle { font-size: 1.1rem; color: var(--text-secondary); font-weight: 300; }
+    .stats-bar {
+      display: flex; justify-content: center; gap: 40px; margin: 30px 0;
+      flex-wrap: wrap;
+    }
+    .stat-item { text-align: center; }
+    .stat-value { font-size: 2rem; font-weight: 700; color: var(--primary-light); }
+    .stat-label { font-size: 0.85rem; color: var(--text-secondary); margin-top: 4px; }
+    .controls {
+      display: flex; gap: 16px; margin-bottom: 30px;
+      flex-wrap: wrap; align-items: center; justify-content: center;
+    }
+    .search-box {
+      flex: 1; min-width: 280px; max-width: 400px;
+      position: relative;
+    }
+    .search-box input {
+      width: 100%; padding: 14px 20px 14px 48px;
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 14px; color: var(--text); font-size: 1rem;
+      outline: none; transition: all 0.3s;
+    }
+    .search-box input:focus { border-color: var(--primary-light); box-shadow: 0 0 20px rgba(34,211,238,0.15); }
+    .search-box::before {
+      content: "🔍"; position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+      font-size: 1.1rem; opacity: 0.6;
+    }
+    .filter-group { display: flex; gap: 8px; flex-wrap: wrap; }
+    .filter-btn {
+      padding: 10px 20px; border-radius: 10px; border: 1px solid var(--border);
+      background: var(--card-bg); color: var(--text-secondary); cursor: pointer;
+      font-size: 0.9rem; transition: all 0.3s; font-weight: 500;
+    }
+    .filter-btn:hover, .filter-btn.active {
+      background: rgba(8,145,178,0.25); color: var(--primary-light);
+      border-color: var(--primary); box-shadow: 0 0 15px rgba(8,145,178,0.2);
+    }
+    .news-list { display: flex; flex-direction: column; gap: 16px; padding-bottom: 60px; }
+    .news-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 16px; padding: 24px; cursor: pointer;
+      transition: all 0.3s; backdrop-filter: blur(10px);
+      position: relative; overflow: hidden;
+    }
+    .news-card::before {
+      content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--primary), var(--primary-light), var(--primary));
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .news-card:hover { transform: translateY(-3px); border-color: rgba(34,211,238,0.2); box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
+    .news-card:hover::before { opacity: 1; }
+    .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+    .card-title { font-size: 1.15rem; font-weight: 600; color: var(--text); line-height: 1.5; flex: 1; margin-right: 16px; }
+    .card-badges { display: flex; gap: 8px; flex-shrink: 0; }
+    .badge {
+      padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 500;
+    }
+    .badge-regulation { background: rgba(251,191,36,0.15); color: var(--warning); }
+    .badge-announcement { background: rgba(52,211,153,0.15); color: var(--success); }
+    .badge-industry { background: rgba(34,211,238,0.15); color: var(--primary-light); }
+    .badge-recall { background: rgba(248,113,113,0.15); color: var(--danger); }
+    .badge-standard { background: rgba(167,139,250,0.15); color: #a78bfa; }
+    .card-meta { display: flex; gap: 16px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
+    .meta-item { font-size: 0.85rem; color: var(--text-secondary); display: flex; align-items: center; gap: 4px; }
+    .card-summary { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.7; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .card-summary:hover { -webkit-line-clamp: unset; }
+    .source-tag { font-size: 0.8rem; padding: 2px 10px; border-radius: 4px; background: rgba(8,145,178,0.15); color: var(--primary-light); }
+    .rank-num {
+      width: 36px; height: 36px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.95rem; margin-right: 14px; flex-shrink: 0;
+    }
+    .rank-1 { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #fff; }
+    .rank-2 { background: linear-gradient(135deg, #94a3b8, #64748b); color: #fff; }
+    .rank-3 { background: linear-gradient(135deg, #b45309, #92400e); color: #fff; }
+    .rank-other { background: rgba(255,255,255,0.08); color: var(--text-secondary); }
+    .card-main { display: flex; align-items: flex-start; }
+    .loading { text-align: center; padding: 60px; color: var(--text-secondary); }
+    .no-result { text-align: center; padding: 60px; }
+    .no-result-icon { font-size: 4rem; margin-bottom: 16px; opacity: 0.5; }
+    @media (max-width: 768px) {
+      .logo { font-size: 2rem; }
+      .card-header { flex-direction: column; }
+      .card-badges { margin-top: 10px; }
+      .stats-bar { gap: 20px; }
+      .search-box { min-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-pattern"></div>
+  <div class="container">
+    <header>
+      <h1 class="logo">牙膏资讯汇</h1>
+      <p class="subtitle">行业新规 · 监管动态 · 市场情报 · 一站式聚合</p>
+      <div class="stats-bar">
+        <div class="stat-item"><div class="stat-value" id="totalCount">--</div><div class="stat-label">资讯总数</div></div>
+        <div class="stat-item"><div class="stat-value" id="regCount">--</div><div class="stat-label">新规文件</div></div>
+        <div class="stat-item"><div class="stat-value" id="sourceCount">--</div><div class="stat-label">数据来源</div></div>
+      </div>
+    </header>
+
+    <div class="controls">
+      <div class="search-box"><input type="text" id="searchInput" placeholder="搜索标题、摘要、法规内容..." /></div>
+      <div class="filter-group" id="filterGroup">
+        <button class="filter-btn active" data-filter="all">全部</button>
+        <button class="filter-btn" data-filter="regulation">新规法规</button>
+        <button class="filter-btn" data-filter="announcement">监管公告</button>
+        <button class="filter-btn" data-filter="industry">行业动态</button>
+        <button class="filter-btn" data-filter="recall">召回通报</button>
+        <button class="filter-btn" data-filter="standard">标准更新</button>
+      </div>
+    </div>
+
+    <div id="newsList" class="news-list"><div class="loading">正在加载资讯...</div></div>
+  </div>
+
+  <script>
+    let allNews = [];
+    let currentFilter = 'all';
+
+    async function loadData() {
+      try {
+        const res = await fetch('data.json');
+        allNews = await res.json();
+        renderNews();
+        updateStats();
+      } catch(e) {
+        document.getElementById('newsList').innerHTML = '<div class="loading">数据加载失败，请稍后重试</div>';
+      }
+    }
+
+    function updateStats() {
+      document.getElementById('totalCount').textContent = allNews.length;
+      document.getElementById('regCount').textContent = allNews.filter(n => n.category === 'regulation').length;
+      const sources = new Set(allNews.map(n => n.source));
+      document.getElementById('sourceCount').textContent = sources.size;
+    }
+
+    function renderNews() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const filtered = allNews.filter(item => {
+        const matchFilter = currentFilter === 'all' || item.category === currentFilter;
+        const matchSearch = !search ||
+          item.title.toLowerCase().includes(search) ||
+          (item.summary && item.summary.toLowerCase().includes(search));
+        return matchFilter && matchSearch;
+      });
+
+      const list = document.getElementById('newsList');
+      if (filtered.length === 0) {
+        list.innerHTML = '<div class="no-result"><div class="no-result-icon">🔍</div><p>未找到相关资讯</p></div>';
+        return;
+      }
+
+      list.innerHTML = filtered.map((item, index) => {
+        const rankClass = index === 0 ? 'rank-1' : index === 1 ? 'rank-2' : index === 2 ? 'rank-3' : 'rank-other';
+        const badgeClass = `badge-${item.category || 'industry'}`;
+        const categoryName = {
+          regulation: '新规法规', announcement: '监管公告',
+          industry: '行业动态', recall: '召回通报', standard: '标准更新'
+        }[item.category] || '资讯';
+
+        return `
+          <div class="news-card" onclick="window.open('${item.url}', '_blank')">
+            <div class="card-main">
+              <div class="rank-num ${rankClass}">${index + 1}</div>
+              <div style="flex:1;min-width:0;">
+                <div class="card-header">
+                  <div class="card-title">${escapeHtml(item.title)}</div>
+                  <div class="card-badges">
+                    <span class="badge ${badgeClass}">${categoryName}</span>
+                  </div>
+                </div>
+                <div class="card-meta">
+                  <span class="meta-item"><span class="source-tag">${escapeHtml(item.source)}</span></span>
+                  <span class="meta-item">${formatTime(item.time)}</span>
+                  ${item.score ? `<span class="meta-item">热度 ${item.score}</span>` : ''}
+                </div>
+                ${item.summary ? `<div class="card-summary">${escapeHtml(item.summary)}</div>` : ''}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function formatTime(t) {
+      if (!t) return '';
+      const d = new Date(t);
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    }
+
+    document.getElementById('searchInput').addEventListener('input', renderNews);
+    document.getElementById('filterGroup').addEventListener('click', e => {
+      if (!e.target.classList.contains('filter-btn')) return;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      e.target.classList.add('active');
+      currentFilter = e.target.dataset.filter;
+      renderNews();
+    });
+
+    loadData();
+  </script>
+</body>
+</html>
